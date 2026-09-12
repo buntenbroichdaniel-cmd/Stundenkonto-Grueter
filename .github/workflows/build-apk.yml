@@ -35,7 +35,7 @@ jobs:
       - name: App entpacken
         run: |
           mkdir android-project
-          unzip -q Stundenkonto_Grueter_Android_Final-2.zip -d android-project
+          unzip -q Stundenkonto_Gruettner_Android_v1.2.zip -d android-project
           ls -la android-project/Stundenkonto_Grueter_Android_Final
 
       - name: APK bauen
@@ -45,5 +45,5 @@ jobs:
       - name: APK bereitstellen
         uses: actions/upload-artifact@v4
         with:
-          name: Stundenkonto-Grueter-APK
+          name: Grütner-APK
           path: android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/debug/app-debug.apk
