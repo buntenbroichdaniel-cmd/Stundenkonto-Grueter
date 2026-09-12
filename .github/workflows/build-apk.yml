@@ -34,7 +34,7 @@ jobs:
       - name: App entpacken
         run: |
           mkdir android-project
-          unzip -q Stundenkonto_Gruettner_Android_v1.2.zip -d android-project
+          unzip -q Stundenkonto_Gruettner_Android_v1.3.zip -d android-project
           ls -la android-project/Stundenkonto_Grueter_Android_Final
 
       - name: Release APK bauen
@@ -55,8 +55,10 @@ jobs:
           BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0"
           UNSIGNED="android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/app-release-unsigned.apk"
           ALIGNED="android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/app-release-aligned.apk"
-          SIGNED="android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/Stundenkonto-Gruettner-v1.2.apk"
+          SIGNED="android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/Stundenkonto-Gruettner-v1.3.apk"
+
           "$BUILD_TOOLS/zipalign" -p -f 4 "$UNSIGNED" "$ALIGNED"
+
           "$BUILD_TOOLS/apksigner" sign \
             --ks release.jks \
             --ks-key-alias stundenkonto \
@@ -64,10 +66,14 @@ jobs:
             --key-pass env:KEY_PASS \
             --out "$SIGNED" \
             "$ALIGNED"
-          "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$SIGNED"
+
+          "$BUILD_TOOLS/apksigner" verify \
+            --verbose \
+            --print-certs \
+            "$SIGNED"
 
       - name: Signierte APK bereitstellen
         uses: actions/upload-artifact@v4
         with:
-          name: Stundenkonto-Gruettner-v1.2-signed
-          path: android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/Stundenkonto-Gruettner-v1.2.apk
+          name: Stundenkonto-Gruettner-v1.3-signed
+          path: android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/Stundenkonto-Gruettner-v1.3.apk
