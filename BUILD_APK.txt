@@ -1,0 +1,22 @@
+STUNDENKONTO GRÜTER – APK BUILD
+
+Die App ist als natives Android-WebView-Projekt vorbereitet.
+Paketname: de.stundenkonto.grueter
+Min Android: 8.0 (API 26)
+Target/Compile SDK: 35
+AGP: 8.7.3
+Gradle: 8.9
+
+AUTOMATISCHER BUILD ÜBER GITHUB ACTIONS
+1. Diesen kompletten Projektordner in ein neues GitHub-Repository hochladen.
+2. Branch "main" verwenden.
+3. Unter Actions den Workflow "Build Android APK" öffnen.
+4. "Run workflow" ausführen (oder einfach auf main pushen).
+5. Nach erfolgreichem Build das Artifact "Stundenkonto-Grueter-APK" herunterladen.
+6. Darin liegt app-debug.apk. Diese APK ist direkt auf Android installierbar.
+
+LOKALER BUILD
+Mit installiertem Android SDK 35 und Gradle 8.9 im Projektordner:
+  gradle :app:assembleDebug
+Die APK liegt danach unter:
+  app/build/outputs/apk/debug/app-debug.apk
