@@ -1,4 +1,4 @@
-name: Build Stundenkonto APK
+name: Build signierte Stundenkonto APK
 
 on:
   workflow_dispatch:
@@ -24,8 +24,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Android SDK 35 installieren
-        run: |
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
       - name: Gradle 8.9 einrichten
         uses: gradle/actions/setup-gradle@v4
@@ -38,12 +37,37 @@ jobs:
           unzip -q Stundenkonto_Gruettner_Android_v1.2.zip -d android-project
           ls -la android-project/Stundenkonto_Grueter_Android_Final
 
-      - name: APK bauen
+      - name: Release APK bauen
         working-directory: android-project/Stundenkonto_Grueter_Android_Final
-        run: gradle :app:assembleDebug --stacktrace
+        run: gradle :app:assembleRelease --stacktrace
 
-      - name: APK bereitstellen
+      - name: Signaturschlüssel laden
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        run: |
+          echo "$SIGNING_KEY" | base64 --decode > release.jks
+
+      - name: APK ausrichten und signieren
+        env:
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0"
+          UNSIGNED="android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/app-release-unsigned.apk"
+          ALIGNED="android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/app-release-aligned.apk"
+          SIGNED="android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/Stundenkonto-Gruettner-v1.2.apk"
+          "$BUILD_TOOLS/zipalign" -p -f 4 "$UNSIGNED" "$ALIGNED"
+          "$BUILD_TOOLS/apksigner" sign \
+            --ks release.jks \
+            --ks-key-alias stundenkonto \
+            --ks-pass env:KS_PASS \
+            --key-pass env:KEY_PASS \
+            --out "$SIGNED" \
+            "$ALIGNED"
+          "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$SIGNED"
+
+      - name: Signierte APK bereitstellen
         uses: actions/upload-artifact@v4
         with:
-          name: Grütner-APK
-          path: android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/debug/app-debug.apk
+          name: Stundenkonto-Gruettner-v1.2-signed
+          path: android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/Stundenkonto-Gruettner-v1.2.apk
