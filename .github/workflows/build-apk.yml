@@ -35,10 +35,10 @@ jobs:
         run: |
           mkdir android-project
           unzip -q Stundenkonto_Gruettner_Android_v1.3.zip -d android-project
-          ls -la android-project/Stundenkonto_Grueter_Android_Final
+          ls -la android-project
 
       - name: Release APK bauen
-        working-directory: android-project/Stundenkonto_Grueter_Android_Final
+        working-directory: android-project
         run: gradle :app:assembleRelease --stacktrace
 
       - name: Signaturschlüssel laden
@@ -53,9 +53,9 @@ jobs:
           KEY_PASS: ${{ secrets.KEY_PASSWORD }}
         run: |
           BUILD_TOOLS="$ANDROID_HOME/build-tools/35.0.0"
-          UNSIGNED="android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/app-release-unsigned.apk"
-          ALIGNED="android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/app-release-aligned.apk"
-          SIGNED="android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/Stundenkonto-Gruettner-v1.3.apk"
+          UNSIGNED="android-project/app/build/outputs/apk/release/app-release-unsigned.apk"
+          ALIGNED="android-project/app/build/outputs/apk/release/app-release-aligned.apk"
+          SIGNED="android-project/app/build/outputs/apk/release/Stundenkonto-Gruettner-v1.3.apk"
 
           "$BUILD_TOOLS/zipalign" -p -f 4 "$UNSIGNED" "$ALIGNED"
 
@@ -76,4 +76,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Stundenkonto-Gruettner-v1.3-signed
-          path: android-project/Stundenkonto_Grueter_Android_Final/app/build/outputs/apk/release/Stundenkonto-Gruettner-v1.3.apk
+          path: android-project/app/build/outputs/apk/release/Stundenkonto-Gruettner-v1.3.apk
